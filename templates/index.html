@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator by Vedika</title>
+    <style>
+        body {
+            background-color: #2C3E50;
+            color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        h2 {
+            font-size: 7px; /* Adjust the size as needed */
+        }
+        p { 
+            font-size: 10px;
+            margin-bottom: 2px; /* Reduces space below the text */
+            margin-top: -2px;  /* Moves the text upwards */
+        }
+        
+        /* Move "Enter second number" and "Select Operation" upwards */
+        p:nth-of-type(2),  
+        p:nth-of-type(3) {
+            margin-top: -5px; /* Moves them further up */
+            text-align: center; /* Centers text */
+        }
+        .calculator {
+            background-color: #34495E;
+            padding: 2px;
+            border-radius: 3px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: inline-block;
+            width: 190px;
+        }
+        input {
+            width: 60%;
+            padding: 0.5px;
+            margin: 1px , 0;
+            font-size: 10px;
+            text-align: center;
+            border: none;
+            border-radius: 2px;
+            background: white;
+            color: black;
+        }
+        .buttons {
+            /*display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 1px;
+            justify-content: center;
+            margin: 10px 0;*/
+            display: grid;
+            grid-template-columns: repeat(4, 1fr); /* Adjusted to 4 columns */
+            gap: 5px; /* Add space between buttons */
+            justify-content: center; /* Center buttons horizontally */
+            margin: 10px 0;
+        }
+        button {
+            width: 40px;
+            height: 12px;
+            font-size: 10px;
+            border: none;
+            justify-content: center;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: -2px; 
+        }
+        .num {
+            background-color: #3498DB;
+            color: white;
+        }
+        .clear {
+            width: 35px;
+            height: 12px;
+            text-align: left;
+            font-size:6;
+            background-color: #E74C3C;
+            color: white;
+        }
+        .op {
+            width: 40px;
+            height: 20px;
+            gap: 4px;
+            font-size: 15px;
+            text-align: center;
+            justify-content: center;
+            background-color: #F39C12;
+            color: white;
+        }
+        .result {
+            font-size: 10px;
+            /*margin-top: 10px;*/
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <p>Enter first number:</p>
+        <input type="text" id="num1" readonly>
+        <div class="buttons">
+            <button class="num" onclick="addToInput('num1', '0')">0</button>
+            <button class="num" onclick="addToInput('num1', '1')">1</button>
+            <button class="num" onclick="addToInput('num1', '2')">2</button>
+            <button class="num" onclick="addToInput('num1', '3')">3</button>
+            <button class="num" onclick="addToInput('num1', '4')">4</button>
+            <button class="num" onclick="addToInput('num1', '5')">5</button>
+            <button class="num" onclick="addToInput('num1', '6')">6</button>
+            <button class="num" onclick="addToInput('num1', '7')">7</button>
+            <button class="num" onclick="addToInput('num1', '8')">8</button>
+            <button class="num" onclick="addToInput('num1', '9')">9</button>
+            <button class="clear" onclick="clearInput('num1')">Clear</button>
+        </div>
+
+        <p>Enter second number:</p>
+        <input type="text" id="num2" readonly>
+        <div class="buttons">
+            <button class="num" onclick="addToInput('num2', '0')">0</button>
+            <button class="num" onclick="addToInput('num2', '1')">1</button>
+            <button class="num" onclick="addToInput('num2', '2')">2</button>
+            <button class="num" onclick="addToInput('num2', '3')">3</button>
+            <button class="num" onclick="addToInput('num2', '4')">4</button>
+            <button class="num" onclick="addToInput('num2', '5')">5</button>
+            <button class="num" onclick="addToInput('num2', '6')">6</button>
+            <button class="num" onclick="addToInput('num2', '7')">7</button>
+            <button class="num" onclick="addToInput('num2', '8')">8</button>
+            <button class="num" onclick="addToInput('num2', '9')">9</button>
+            <button class="clear" onclick="clearInput('num2')">Clear</button>
+        </div>
+
+
+        <p>Select Operation:</p>
+        <div class="buttons">
+            <button class="op" onclick="calculate('+')">+</button>
+            <button class="op" onclick="calculate('-')">-</button>
+            <button class="op" onclick="calculate('*')">*</button>
+            <button class="op" onclick="calculate('/')">/</button>
+        </div>
+
+        <p class="result">= <span id="result">0</span></p>
+    </div>
+
+    <script>
+        function addToInput(inputId, value) {
+            document.getElementById(inputId).value += value;
+        }
+
+        function clearInput(inputId) {
+            document.getElementById(inputId).value = '';
+        }
+
+        function calculate(operator) {
+            let num1 = document.getElementById("num1").value;
+            let num2 = document.getElementById("num2").value;
+            
+            fetch('/calculate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ num1, num2, operator })
+            })
+            .then(response => response.json())
+            .then(data => {
+                /*document.getElementById("result").innerText = data.result;*/ 
+                let resultElement = document.getElementById("result");
+                resultElement.innerText = data.result;
+                if (data.result === "Error: Cannot divide by zero!" || data.result === "Error: Enter valid numbers!") {
+                    resultElement.style.color = "red";
+                } else if (data.result === "Invalid operation!") {
+                    resultElement.style.color = "yellow";
+                } else {
+                    resultElement.style.color = "white"; // Default color for valid result
+                }
+            });
+        }
+    </script>
+</body>
+</html>
